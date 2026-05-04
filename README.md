@@ -18,10 +18,12 @@ A personal archive for managing worldbuilding projects and technical manifests. 
 
 ---
 
-### **## How to run**
+### **## How to Run**
 
 1.  **Initialize**: Install the dependencies.
     `npm install`
 2.  **Bind**: Clone `.env.example` to `.env.local` and inject your Firebase keys.
 3.  **Launch**: Run the development engine.
-    `npm run electron-dev`
+    *   **Option A (The Forge Method)**: Double-click **`run.bat`** in the root directory for a single-click startup.
+    *   **Option B (The Terminal Method)**: Execute via npm:
+        `npm run electron-dev`
