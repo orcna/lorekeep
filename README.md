@@ -23,6 +23,7 @@ A personal archive for managing worldbuilding projects and technical manifests. 
 1.  **Initialize**: Install the dependencies.
     `npm install`
 2.  **Bind**: Clone `.env.example` to `.env.local` and inject your Firebase keys.
+    > **CRITICAL**: You **must** populate all API keys in `.env.local` correctly. The application will fail to initialize or sync without these credentials.
 3.  **Launch**: Run the development engine.
     *   **Option A (The Forge Method)**: Double-click **`run.bat`** in the root directory for a single-click startup.
     *   **Option B (The Terminal Method)**: Execute via npm:
