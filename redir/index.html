@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>LOREKEEP_AUTH_BRIDGE</title>
+  <script defer src="/__/firebase/12.12.1/firebase-app-compat.js"></script>
+  <script defer src="/__/firebase/12.12.1/firebase-auth-compat.js"></script>
+  <script defer src="/__/firebase/init.js?useEmulator=false"></script>
+
+  <style>
+    body { 
+      background: #000; 
+      color: #71717a; 
+      font-family: 'JetBrains Mono', 'Fira Code', monospace; 
+      margin: 0; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      height: 100vh; 
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-size: 10px;
+    }
+    #status { border-left: 2px solid #fff; padding-left: 20px; }
+    .highlight { color: #fff; font-weight: 900; }
+  </style>
+</head>
+<body>
+  <div id="status">
+    INITIALIZING_AUTH_PROTOCOL...<br>
+    <span id="sub-status" class="highlight">WAITING_FOR_OPERATOR</span>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const subStatus = document.getElementById('sub-status');
+      
+      // Firebase otomatik olarak init.js ile kurulacak, 
+      // ama emin olmak için onAuthStateChanged dinleyicisi:
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          subStatus.innerText = "AUTH_SUCCESS: REDIRECTING_TO_STATION";
+          
+          // 🚀 KRİTİK: Deep Link fırlatma. App.tsx bu linki yakalayacak. 
+          const deepLink = `lorekeep://auth?uid=${user.uid}&email=${user.email}`;
+          window.location.href = deepLink;
+          
+          setTimeout(() => {
+            subStatus.innerHTML = "SESSION_LINKED.<br>YOU_MAY_CLOSE_THIS_TAB.";
+          }, 3000);
+        } else {
+          subStatus.innerText = "STARTING_GOOGLE_AUTH_POPUP...";
+          const provider = new firebase.auth.GoogleAuthProvider();
+          
+          // Tarayıcı ortamında olduğumuz için popup engeline takılmaz 
+          firebase.auth().signInWithPopup(provider).catch(err => {
+            subStatus.innerText = "AUTH_ERROR: " + err.message;
+            console.error(err);
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

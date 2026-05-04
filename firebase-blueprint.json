@@ -1,0 +1,96 @@
+{
+  "entities": {
+    "LoreEntry": {
+      "title": "Lore Entry",
+      "description": "A piece of information documenting the transmedia universe.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "category": { "type": "string", "enum": ["character", "history", "mechanic", "location", "other"] },
+        "userId": { "type": "string" },
+        "universeId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "content", "category", "userId", "universeId"]
+    },
+    "ChatMessage": {
+      "title": "Chat Message",
+      "description": "A message in a conversation with the Oracle.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "text": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "assistant"] },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string" },
+        "universeId": { "type": "string" }
+      },
+      "required": ["text", "role", "userId"]
+    },
+    "MapMarker": {
+      "title": "Map Marker",
+      "description": "A geolocation point on the world map linked to lore.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "loreId": { "type": "string" },
+        "universeId": { "type": "string" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "userId": { "type": "string" }
+      },
+      "required": ["loreId", "universeId", "x", "y", "userId"]
+    },
+    "MapConfig": {
+      "title": "Map Config",
+      "description": "Configuration for the individual user's world map image.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "universeId": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "useLineart": { "type": "boolean" }
+      },
+      "required": ["userId", "universeId", "imageUrl"]
+    },
+    "Universe": {
+      "title": "Universe",
+      "description": "A thematic world grouping lore and maps.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "userId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/lore": {
+      "schema": "LoreEntry",
+      "description": "Global lore entries."
+    },
+    "/chats": {
+      "schema": "ChatMessage",
+      "description": "Oracle chat history."
+    },
+    "/markers": {
+      "schema": "MapMarker",
+      "description": "Interactive map markers."
+    },
+    "/mapConfigs": {
+      "schema": "MapConfig",
+      "description": "User specific map background settings."
+    },
+    "/universes": {
+      "schema": "Universe",
+      "description": "Collection for world silos."
+    }
+  }
+}

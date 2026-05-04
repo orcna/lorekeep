@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-medieval: "Cinzel", "Uncial Antiqua", "Luminari", "Old English Text MT", "Georgia", serif;
+}
+
+@layer base {
+  :root {
+    --bg: #ffffff;
+    --fg: #111111;
+    --primary: #222222;
+    --surface: #fafafa;
+    --border: #cccccc;
+    --accent: #000000;
+    --grid: #e5e5e5;
+    --glass: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.1);
+  }
+
+  :root.dark {
+    --bg: #0a0a0a;
+    --fg: #d0d0d0;
+    --primary: #ffffff;
+    --surface: #111111;
+    --border: #333333;
+    --accent: #ffffff;
+    --grid: #1a1a1a;
+    --glass: rgba(15, 15, 15, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+  }
+
+  body {
+    background-color: var(--bg);
+    background-image: 
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+    color: var(--fg);
+    font-family: var(--font-mono);
+    transition: background-color 0.1s, color 0.1s;
+    letter-spacing: -0.01em;
+  }
+
+  * {
+    cursor: default;
+  }
+}
+
+/* Lineart Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+
+.line-border {
+  border: 1px solid var(--border);
+}
+
+.line-border-b {
+  border-bottom: 1px solid var(--border);
+}
+
+.line-border-r {
+  border-right: 1px solid var(--border);
+}
+
+.line-shadow {
+  box-shadow: 2px 2px 0px var(--border);
+}
+
+/* Minimal CRT */
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: repeating-linear-gradient(
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.02) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  background-size: 100% 2px;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.interactive-line:hover {
+  background-color: var(--surface);
+  border-color: var(--accent);
+}
+
+.glass-card {
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.crt-overlay::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
+  animation: scanline 8s linear infinite;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  background: transparent;
+}
+
+input[type="range"]::-webkit-scrollbar {
+  display: none;
+}
+
+::selection {
+  background: var(--fg);
+  color: var(--bg);
+}
+

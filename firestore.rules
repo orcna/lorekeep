@@ -1,0 +1,102 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidLoreEntry(data) {
+      return data.keys().hasAll(['title', 'content', 'category', 'userId', 'universeId', 'createdAt', 'updatedAt']) &&
+             data.keys().size() == 7 &&
+             data.title is string && data.title.size() <= 200 &&
+             data.content is string && data.content.size() <= 10000 &&
+             data.category in ['character', 'history', 'mechanic', 'location', 'other'] &&
+             data.userId == request.auth.uid &&
+             data.universeId is string &&
+             data.createdAt == request.time &&
+             data.updatedAt == request.time;
+    }
+
+    function isValidChatMessage(data) {
+      return data.keys().hasAll(['text', 'role', 'userId', 'timestamp']) &&
+             data.text is string && data.text.size() <= 5000 &&
+             data.role in ['user', 'assistant'] &&
+             data.userId == request.auth.uid &&
+             data.timestamp == request.time;
+    }
+
+    function isValidMarker(data) {
+      return data.keys().hasAll(['loreId', 'universeId', 'x', 'y', 'userId']) &&
+             data.loreId is string &&
+             data.universeId is string &&
+             data.x is number && data.y is number &&
+             data.userId == request.auth.uid;
+    }
+
+    function isValidMapConfig(data) {
+      return data.keys().hasAll(['userId', 'universeId', 'useLineart']) &&
+             (data.keys().hasAny(['imageUrl', 'layers'])) &&
+             data.universeId is string &&
+             data.useLineart is bool &&
+             data.userId == request.auth.uid;
+    }
+
+    function isValidUniverse(data) {
+      return data.keys().hasAll(['name', 'description', 'userId', 'createdAt']) &&
+             data.name is string && data.name.size() <= 100 &&
+             data.userId == request.auth.uid &&
+             data.createdAt == request.time;
+    }
+
+    match /lore/{loreId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidLoreEntry(request.resource.data);
+      allow update: if isSignedIn() && 
+                      resource.data.userId == request.auth.uid &&
+                      request.resource.data.userId == request.auth.uid &&
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'content', 'category', 'updatedAt']) &&
+                      request.resource.data.updatedAt == request.time;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /chats/{chatId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidChatMessage(request.resource.data);
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /markers/{markerId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidMarker(request.resource.data);
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid && isValidMarker(request.resource.data);
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /mapConfigs/{configId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidMapConfig(request.resource.data);
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid && isValidMapConfig(request.resource.data);
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /universes/{universeId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidUniverse(request.resource.data);
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+  }
+}
