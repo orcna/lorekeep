@@ -1,20 +1,27 @@
-# Lorekeep
+## **# Lorekeep**
 
-Lorekeep is a tool I built to manage my worldbuilding projects and technical notes. It is designed to keep everything in one place with a simple dark interface.
+A personal archive for managing worldbuilding projects and technical manifests. One interface, no distractions.
 
-## Features
-* **World Atlas**: A map editor to draw and manage world coordinates.
-* **Hybrid Sync**: Local-first data with Firebase backup.
-* **Electron**: Runs as a desktop application.
-* **AI Support**: Integrated with Ollama for local AI help.
+---
 
-## Tech Stack
-* React + TypeScript + Vite
-* Electron
-* Firebase (Firestore)
-* Tailwind CSS
+### **## Manifest (Features)**
+*   **World Atlas**: Map editor for coordinate management[cite: 1].
+*   **Hybrid Sync**: Local-first logic with Firebase cloud backup[cite: 1].
+*   **Desktop Core**: Runs as a dedicated desktop environment via Electron[cite: 1].
+*   **Neural Shards**: Local AI assistance powered by Ollama integration[cite: 1].
 
-## How to run
-1. Install dependencies: `npm install`
-2. Configuration: Copy `.env.example` to `.env.local` and add your Firebase keys.
-3. Run development: `npm run electron:dev`
+### **## The Engine (Tech Stack)**
+*   **Frontend**: React + TypeScript + Vite[cite: 1].
+*   **Shell**: Electron[cite: 1].
+*   **Archive**: Firebase Firestore[cite: 1].
+*   **Style**: Tailwind CSS[cite: 1].
+
+---
+
+### **## Ignition (How to run)**
+
+1.  **Initialize**: Install the dependencies.
+    `npm install`[cite: 1]
+2.  **Bind**: Clone `.env.example` to `.env.local` and inject your Firebase keys[cite: 1].
+3.  **Launch**: Ignite the development engine.
+    `npm run electron-dev`
