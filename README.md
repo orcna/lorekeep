@@ -10,7 +10,7 @@ A personal archive for managing worldbuilding projects and technical manifests. 
 *   **Desktop Core**: Runs as a dedicated desktop environment via Electron.
 *   **Neural Shards**: Local AI assistance powered by Ollama integration.
 
-### **## The Engine (Tech Stack)**
+### **## Tech Stack**
 *   **Frontend**: React + TypeScript + Vite.
 *   **Shell**: Electron.
 *   **Archive**: Firebase Firestore.
