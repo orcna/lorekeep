@@ -47,6 +47,11 @@ export default function SystemSettings({
     } catch (e) {}
   }, [setAiEnabled]);
 
+
+  const switchMode = (newMode: 'local' | 'cloud') => {
+  localStorage.setItem('lorekeep_mode', newMode);
+  window.location.reload(); 
+  };
   // logic: config
   const handleSaveConfig = (e: React.FormEvent) => {
     e.preventDefault();

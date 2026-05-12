@@ -1,11 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { db, auth } from '../lib/firebase';
+import { db, auth, isFirebaseActive } from '../lib/firebase';
 import { 
   collection, query, where, onSnapshot, 
   setDoc, doc, deleteDoc, getDocs 
 } from 'firebase/firestore';
 import {
-  getLocalUserId,
   getUniverses as getLocalUniverses,
   createUniverse as createLocalUniverse,
   updateUniverse as updateLocalUniverse,
@@ -36,30 +35,30 @@ export const UniverseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [activeUniverse, setActiveUniverse] = useState<Universe | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // CORE_BOOT: Hibrit Senkronizasyon (Operatör Duyarlı)
   useEffect(() => {
+    const initialLocal = getLocalUniverses(); 
+    setUniverses(initialLocal);
+
+    if (!isFirebaseActive || !auth?.onAuthStateChanged) {
+      console.log("[SİSTEM] Yerel Mod. Firebase atlanıyor...");
+      setIsLoading(false);
+      return;
+    }
+
     let unsubscribeSnapshot: (() => void) | undefined;
 
-    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
-      // 1. Önce aktif operatörün yerel verilerini her durumda yükle (Hızlı erişim)
-      const initialLocal = getLocalUniverses(); 
-      setUniverses(initialLocal);
-
+    const unsubscribeAuth = auth.onAuthStateChanged((user: any) => {
       if (user) {
-        // GOOGLE OPERATÖRÜ: Firestore senkronizasyonunu başlat
         const q = query(collection(db, 'universes'), where('userId', '==', user.uid));
         let isFirstSnapshot = true;
 
         unsubscribeSnapshot = onSnapshot(q, (snapshot) => {
           const remoteUniverses = snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as Universe[];
-          
-          // ANTI-NUKE LOGIC: Bulut boşsa ama yerel doluysa yereli koru
           if (remoteUniverses.length === 0 && initialLocal.length > 0 && isFirstSnapshot) {
             setUniverses(initialLocal);
           } else {
             setUniverses(remoteUniverses);
           }
-          
           isFirstSnapshot = false; 
           setIsLoading(false);
         }, (error) => {
@@ -67,11 +66,8 @@ export const UniverseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           setIsLoading(false);
         });
       } else {
-        // YEREL OPERATÖR: Sadece yerel verilerle devam et
         const localOp = getCurrentUser();
-        if (localOp) {
-          setUniverses(initialLocal);
-        }
+        if (localOp) setUniverses(initialLocal);
         setIsLoading(false);
       }
     });
@@ -83,12 +79,11 @@ export const UniverseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
 
   const createUniverse = async (name: string, description: string) => {
-    const next = createLocalUniverse(name, description); // Yerel mühür
-    
+    const next = createLocalUniverse(name, description); 
     setUniverses(prev => [...prev, next]);
     setActiveUniverse(next);
 
-    if (auth.currentUser) {
+    if (isFirebaseActive && auth.currentUser) {
       await setDoc(doc(db, 'universes', next.id), {
         ...next,
         userId: auth.currentUser.uid,
@@ -100,7 +95,7 @@ export const UniverseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const updateUniverse = async (id: string, name: string, description: string) => {
     updateLocalUniverse(id, name, description);
-    if (auth.currentUser) {
+    if (isFirebaseActive && auth.currentUser) {
       await setDoc(doc(db, 'universes', id), { 
         name, description, 
         userId: auth.currentUser.uid, 
@@ -110,10 +105,6 @@ export const UniverseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const deleteUniverse = async (id: string) => {
-    const user = getCurrentUser();
-    const userId = auth.currentUser?.uid || user?.id || 'guest';
-
-    // 🛡️ DÜZELTME: Sadece mevcut operatörün listesinden siler[cite: 5]
     const filtered = universes.filter(u => u.id !== id);
     setUniverses(filtered);
     
@@ -124,8 +115,7 @@ export const UniverseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setActiveUniverse(filtered[0] || null);
     }
 
-    // Fiziksel silme işlemi (localStorage.ts içindeki deleteUniverse zaten mühürlendi)
-    if (auth.currentUser) {
+    if (isFirebaseActive && auth.currentUser) {
       try {
         const collections = ['lore', 'markers', 'mapConfigs', 'scripts', 'messages', 'chats'];
         for (const col of collections) {
@@ -144,7 +134,7 @@ export const UniverseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const mapState = { imageUrl, useLineart, markers, updatedAt: new Date().toISOString() };
     localStorage.setItem(`map_cache_${id}`, JSON.stringify(mapState));
 
-    if (auth.currentUser) {
+    if (isFirebaseActive && auth.currentUser) {
       await setDoc(doc(db, 'mapConfigs', id), { ...mapState, universeId: id, userId: auth.currentUser.uid }, { merge: true });
     }
   };

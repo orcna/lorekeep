@@ -612,14 +612,14 @@ export default function WorldMap() {
           --scribe-btn: #b6a54d;
           --scribe-sidebar: rgba(0, 0, 0, 0.04);
           --scribe-surface: #d1cfc4;
-          --parchment-img: url('/assets/ui/parchment-base.png');
+          --parchment-img: url('./assets/ui/parchment-base.png');
         }
         html[data-theme='dark'] {
           --scribe-ink: #1a1714;
           --scribe-bg: #2a2621;
           --scribe-sidebar: rgba(0, 0, 0, 0.2);
           --scribe-surface: #2a2621;
-          --parchment-img: url('/assets/ui/parchment-dark.png');
+          --parchment-img: url('./assets/ui/parchment-dark.png');
         }
         .scribe-ink { color: var(--scribe-ink) !important; }
         .scribe-btn-text { 
@@ -654,8 +654,8 @@ export default function WorldMap() {
           position: relative;
           font-family: ${MONO} !important;
         }
-        .lore-btn-medieval { border-image-source: url('/assets/ui/medieval-frame.png'); border-image-slice: 165 fill; border-width: 14px; }
-        .lore-btn-medieval-sm { border-image-source: url('/assets/ui/medieval-frame-small.png'); border-image-slice: 165 fill; border-width: 14px; }
+        .lore-btn-medieval { border-image-source: url('./assets/ui/medieval-frame.png'); border-image-slice: 165 fill; border-width: 14px; }
+        .lore-btn-medieval-sm { border-image-source: url('./assets/ui/medieval-frame-small.png'); border-image-slice: 165 fill; border-width: 14px; }
         .lore-btn-medieval:hover, .lore-btn-medieval-sm:hover { filter: brightness(1.3); transform: translateY(-1px); }
       `}</style>
     </div>
